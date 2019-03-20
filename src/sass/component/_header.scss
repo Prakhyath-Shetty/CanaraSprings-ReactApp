@@ -1,0 +1,33 @@
+#{$cs}-header{
+    position: relative;
+    display: flex;
+    height: 40px;
+    background-color: $pri-color;
+
+    &__logo{
+        border-right:solid 1px $pri-color--dark;
+        padding: 5px 20px;
+        line-height: 30px;
+        color: #fff;
+    }
+
+    &__toolbar{
+        display: inline-flex;       
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        top: 0;
+
+        &-item{
+            color:#fff;
+            font-size: 12px;
+            padding: 0 10px;
+            border-left: solid 1px $pri-color--dark;
+            line-height: 40px;
+
+            .fas,.far{
+                margin-right: 5px;
+            }
+        }
+    }
+}

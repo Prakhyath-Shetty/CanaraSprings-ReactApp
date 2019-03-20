@@ -1,0 +1,50 @@
+#{$cs}-body{
+    height: calc(100% - 70px);
+    &__container{
+        overflow: auto;
+        height: calc(100% - 25px);
+        padding: 20px 50px;
+    }
+
+    &__breadcrumbs{
+        display: flex;
+        background: #eee;
+        padding: 0 50px;
+        &-item{
+            font-size: 10px;
+            font-weight: 500;
+            margin-right: 40px;
+
+            a{
+                position: relative;
+                display: inline-block;
+                height: 25px;
+                line-height: 25px;
+                cursor: pointer;
+
+                &:after{
+                    content: "";
+                    display: inline-block;
+                    height: 17px;
+                    width: 17px;
+                    border: solid 1px #aaa;
+                    transform: rotate(45deg);
+                    border-left: none;
+                    border-bottom: none;
+                    position: absolute;
+                    right: -25px;
+                    top: 4px;
+                }
+                
+            }
+
+            &:last-child{
+                a{
+                    &:after{
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}

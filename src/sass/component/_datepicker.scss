@@ -1,0 +1,9 @@
+#{$cs}-datepicker{
+    height: calc(100% - 70px);
+    .react-datepicker-wrapper{
+        display: block;
+        .react-datepicker__input-container{
+            display: block;
+        }
+    }
+}

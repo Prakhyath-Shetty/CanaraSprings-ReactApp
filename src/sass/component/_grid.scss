@@ -1,0 +1,61 @@
+#{$cs}-grid{
+     .rt-table{
+
+     }
+     .rt-thead{
+          background: #eee;
+     }
+     .rt-body{
+
+     }
+
+     .rt-tr{
+          font-size: 12px;
+     }
+
+     .rt-th{
+          font-weight: 500;
+          text-align: left;
+     }
+
+     .-pagination{
+          font-size: 12px;
+          .-previous{
+
+          }
+
+          .-center{
+
+          }
+
+          .-next{
+
+          }
+     }
+
+     &__textbox{
+          width:100%;
+          border: none;
+          outline: none;
+          background: transparent;
+     }
+
+     .rt-td{
+          input[role="combobox"]{
+               border:none;
+               outline: none;
+               background: transparent;
+          }
+     }
+
+     &.ReactTable .rt-noData{
+          font-size: 12px;
+          background:none;
+          color: #fff;
+          top: 70px;
+          padding: 10px 40px;
+          color: #666;
+          border: solid 1px #ccc;
+     }
+
+}

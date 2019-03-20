@@ -1,0 +1,27 @@
+#{$cs}-btn{
+    background: $pri-color--dark;
+    color: #fff;
+    padding: 10px 30px;
+    font-size: 12px;
+    border-radius: 0;
+    font-weight: 600;
+    text-transform: uppercase;
+
+    + #{$cs}-btn{
+        margin-left: 10px;
+    }
+
+    &:hover{
+        color: #fff;
+    }
+
+    &--link{
+        background: transparent;
+        color: $pri-color--dark;
+        padding:0;
+
+        &:hover{
+            color: $pri-color--dark;
+        }
+    }
+}
