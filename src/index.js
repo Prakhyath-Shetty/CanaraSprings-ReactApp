@@ -9,6 +9,7 @@ import * as serviceWorker from './serviceWorker';
 
 // Stylesheets
 import './sass/main.scss';
+import './sass/vendor.scss';
 
 // Get the application-wide store instance, prepopulating with state from the server where available.
 const initialState = [];
