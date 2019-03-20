@@ -3,9 +3,9 @@ import { Route, Switch } from 'react-router-dom';
 import Header from './common/header';
 import Body from './common/body';
 import Footer from './common/footer';
+import Dashboard from './components/dashboard.jsx';
 import {PartyMasterCont} from './modules/PartyMaster';
 import {DeliverChallanCont} from './modules/DeliveryChallan';
-import Dashboard from './components/dashboard.jsx';
 import NotFound from './components/notFoundPage';
 
 export default class App extends Component {
