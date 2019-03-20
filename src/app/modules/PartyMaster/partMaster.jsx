@@ -1,26 +1,21 @@
 import React, { Component } from 'react'
 import ReactTable from 'react-table';
-import { bindActionCreators } from 'redux';
 
-import "react-table/react-table.css";
-import { connect } from 'react-redux';
-import {fetchPartyMaster} from './actions';
 
 class PartyMaster extends Component {
 
   render() {
-    
       const columns = [{
         Header: 'Code',
-        accessor: 'code' // String-based value accessors!
+        accessor: 'code'
       }, {
         Header: 'Name',
         accessor: 'name'
       }, {
         Header: 'Address',
-        accessor: 'address' // Custom value accessors!
+        accessor: 'address' 
       }, {
-        Header: 'Category', // Custom header components!
+        Header: 'Category', 
         accessor: 'category'
       }]
      
@@ -39,20 +34,13 @@ class PartyMaster extends Component {
                 }} 
                 className="cs-grid" 
                 minRows = {0}
+                showPagination={false}
             />
           </section>
         </div>
       )
   }
 }
-function mapDispatchToProps(dispatch) {
-  return { actions: bindActionCreators(fetchPartyMaster, dispatch) }
-}
 
-function mapStateToProps(state){
-  return {
-    data: state.partymasterReducers,
-  };
-}
 
-export default connect(mapStateToProps,mapDispatchToProps)(PartyMaster);
+export default PartyMaster;
