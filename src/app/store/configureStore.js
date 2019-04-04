@@ -4,11 +4,13 @@ import thunk from 'redux-thunk';
 // reducers
 import App from '../appReducers';
 import PartyMaster from '../modules/PartyMaster/reducers';
+import deliveryChallan from '../store/DeliveryChallan/reducer';
 
 export default function configureStore(initialState){
     const reducers = {
         App,
-        PartyMaster
+        PartyMaster,
+        deliveryChallan
     };
 
     const middleware = [

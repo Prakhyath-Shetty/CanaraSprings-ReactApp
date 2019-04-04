@@ -4,8 +4,8 @@ import Header from './common/header';
 import Body from './common/body';
 import Footer from './common/footer';
 import Dashboard from './components/dashboard.jsx';
-import {PartyMasterCont} from './modules/PartyMaster';
-import {DeliverChallanCont} from './modules/DeliveryChallan';
+import {DeliverChallanCont} from './store/DeliveryChallan/index';
+import Commingsoon from './components/commingsoon';
 import NotFound from './components/notFoundPage';
 
 export default class App extends Component {
@@ -16,12 +16,12 @@ export default class App extends Component {
           <Header/>
           <Body>
             <Switch>
-              <Route path='/reports' component={Header} />
-              <Route path='/invoice' component={Footer} />
+              <Route path='/reports' component={Commingsoon} />
+              <Route path='/invoice' component={Commingsoon} />
               <Route path='/deliverychallan' component={DeliverChallanCont} />
-              <Route path='/stockmanegment' component={Body} />
-              <Route path='/ratemaster' component={Body} />
-              <Route path='/partymaster' component={PartyMasterCont} />
+              <Route path='/stockmanegment' component={Commingsoon} />
+              <Route path='/ratemaster' component={Commingsoon} />
+              <Route path='/partymaster' component={Commingsoon} />
               <Route exact path='/' component={Dashboard} />
               <Route path='' component={NotFound} />
             </Switch>

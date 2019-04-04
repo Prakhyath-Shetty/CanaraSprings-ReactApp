@@ -9,29 +9,37 @@ export default class Grid extends React.Component {
   constructor() {
     super();
     this.gridRef = React.createRef();
-    this.state = {
-      data: [
-          {"sn":1,"productNumber":"","quantity":0,"rate":0,"total":0}       
-      ],
-      products:[              
-        { id: '1', label: '125.06/A2', rate:1400},
-        { id: '2', label: '125.06/AM', rate:2320},
-        { id: '3', label: '125.06/2P', rate:150},
-        { id: '4', label: '125.063', rate:230},
-        { id: '5', label: '125.064', rate:4500 },
-        { id: '5', label: '125.06/AM1', rate:180 }
-        ]
-    };
+    
     this.renderEditable = this.renderEditable.bind(this);
     this.renderAutocomplete =this.renderAutocomplete.bind(this);
     this.renderAction = this.renderAction.bind(this);
     this.navigate =this.navigate.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.isNumeric = this.isNumeric.bind(this);
     this.addRow = this.addRow.bind(this);
     this.deleteRow = this.deleteRow.bind(this);
   }
 
-  onKeyDown(e){      
+  isNumeric(e){
+    const x=e.which||e.keycode;
+    if((x>=48 && x<=57) || x==8 ||
+      (x>=35 && x<=40)|| x==46)
+      return true;
+    else
+      return false;
+  }
+
+  isAlphanumeric(e){
+    const TCode = e.currentTarget.value;
+    const x=e.which||e.keycode;
+    if((x>=48 && x<=57) || x==8 || (x>=35 && x<=40)|| x==46 || (x>64 && x<91) || (x>96 && x<123))
+      return true;
+    else
+      return false;
+  }
+
+  onKeyDown(e,isNumericOnly){      
+    
     if(e.keyCode===13||e.which===13){
         e.preventDefault();   
         const currentCell = $(e.currentTarget).parents(".rt-td");
@@ -46,30 +54,38 @@ export default class Grid extends React.Component {
                 currentRow.next(".rt-tr-group").find(".rt-tr .rt-td:eq(1)").find(".cs-grid__textbox,input[role='combobox']").focus();             
             }
         }       
-     }
-     else{
-       
-        const strLen = e.currentTarget.value.toString().length;
-       
-        switch(e.keyCode){
-          case 37 : 
-            if(e.currentTarget.selectionStart === 0){
-              this.navigate($(e.currentTarget),'prev')
-            }
-          break;
-          case 38:
-            this.navigate($(e.currentTarget),'up')
-          break;
-          case 39:
-            if((strLen - e.currentTarget.selectionStart) === 0){
-              this.navigate($(e.currentTarget),'next')
-            }           
-          break;
-          case 40:
-            this.navigate($(e.currentTarget),'down')
-          break
-        }
-     }
+    }
+    else{
+      
+      const strLen = e.currentTarget.value.toString().length;
+      
+      switch(e.keyCode){
+        case 37 : 
+          if(e.currentTarget.selectionStart === 0){
+            this.navigate($(e.currentTarget),'prev')
+          }
+        break;
+        case 38:
+          this.navigate($(e.currentTarget),'up')
+        break;
+        case 39:
+          if((strLen - e.currentTarget.selectionStart) === 0){
+            this.navigate($(e.currentTarget),'next')
+          }           
+        break;
+        case 40:
+          this.navigate($(e.currentTarget),'down')
+        break;
+      }
+    } 
+    
+    if(isNumericOnly){
+      if (!this.isNumeric(e)) e.preventDefault();
+    }else{
+      if (!this.isAlphanumeric(e)) e.preventDefault();
+    }
+
+    
   }
 
   navigate(item,dir){
@@ -94,42 +110,41 @@ export default class Grid extends React.Component {
   }
 
   addRow(){
-    let newData = this.state.data;
+    let newData = this.props.data;
     if(newData.length>0){
-        const slNo = this.state.data[this.state.data.length-1].sn;
+        const slNo = this.props.data[this.props.data.length-1].sn;
         newData.push(
-            {"sn":slNo + 1,"productNumber":"","quantity":0,"rate":0,"total":0}
+            {"sn":slNo + 1,"productNumber":"","quantity":0,"rate":0,"weight":0,"total":0}
         )
     }else{
       newData.push(
-        {"sn":1,"productNumber":"","quantity":0,"rate":0,"total":0}
+        {"sn":1,"productNumber":"","quantity":0,"rate":0,"weight":0,"total":0}
       )
     }
-    
-    this.setState(state => ({
-        data: newData
-    }));
+    console.log("newData",newData)
+    this.props.handleUpdateNewData(newData);
   }
 
   deleteRow(cellInfo){
-    let newData = this.state.data;
+    let newData = this.props.data;
     newData = newData.filter((item,key)=>{
         return key !== cellInfo.index
     });
-    this.setState(state => ({
-      data: newData
-    }));
+    this.props.handleUpdateNewData(newData);
     
   }
   
   renderEditable(cellInfo) {
     return (   
       <input className="cs-grid__textbox" type="text"
-            value={this.state.data[cellInfo.index][cellInfo.column.id]}             
-            onKeyDown={(e)=>{this.onKeyDown(e,cellInfo)}}
+            value={this.props.data[cellInfo.index][cellInfo.column.id]}    
+
+            onKeyDown={(e)=>{
+              this.onKeyDown(e,true);             
+            }}
             onChange={e => {
               
-                const data = [...this.state.data];
+                const data = [...this.props.data];
                 data[cellInfo.index][cellInfo.column.id] = e.target.value;
                 if(cellInfo.column.id==='rate'||cellInfo.column.id==='quantity'){
                     data[cellInfo.index]['total'] = parseInt(data[cellInfo.index]['rate']) * data[cellInfo.index]['quantity'] 
@@ -144,29 +159,29 @@ export default class Grid extends React.Component {
   renderAutocomplete(cellInfo){
       return(
         <ReactAutocomplete 
-            items={this.state.products}
-            shouldItemRender={(item, value) => item.label.toLowerCase().indexOf(value.toLowerCase()) > -1}
-            getItemValue={item => item.label}
+            items={this.props.products}
+            shouldItemRender={(item, value) =>{   
+              //console.log("partNumber-",item.partNumber.toLowerCase().replace(/[^0-9a-zA-Z]/g, ""),"value-",value.toLowerCase())           
+              return  item.partNumber.toLowerCase().replace(/[^0-9a-zA-Z]/g, "").indexOf(value.toLowerCase()) > -1
+            }}
+            getItemValue={item => item.partNumber}
             renderItem={(item, highlighted) =>
-            <div
-                key={item.id}
-                style={{ backgroundColor: highlighted ? '#eee' : 'transparent'}}
-            >
-                {item.label}
+            <div key={item.id}  style={{ backgroundColor: highlighted ? '#eee' : 'transparent',padding:'5px'}}>
+                {item.partNumber}
             </div>
             }
-            value={this.state.data[cellInfo.index][cellInfo.column.id]} 
+            value={this.props.data[cellInfo.index][cellInfo.column.id]} 
             onChange={e => {
-                const data = [...this.state.data];
-                data[cellInfo.index][cellInfo.column.id] = e.target.value;               
-               
+                const data = [...this.props.data];
+                data[cellInfo.index][cellInfo.column.id] = e.target.value;              
                 this.setState({ data });
             }}
             onSelect={(e,value) =>{
-                const data = [...this.state.data];
-                data[cellInfo.index][cellInfo.column.id] = value.label;
+                const data = [...this.props.data];
+                data[cellInfo.index][cellInfo.column.id] = value.partNumber;
                 if(cellInfo.column.id==='productNumber'){
                     data[cellInfo.index]['rate'] = value.rate 
+                    data[cellInfo.index]['weight'] = value.weight
                 }
                 this.setState({ data });
                 const row = $(".cs-grid").find(".rt-tbody .rt-tr-group")[cellInfo.index];
@@ -185,7 +200,7 @@ export default class Grid extends React.Component {
     )
   }
   render() {
-    const { data } = this.state;
+    const { data } = this.props;
     return (
         <React.Fragment>
           <div className="clearfix m-b-1"><button className="float-right cs-btn btn cs-btn--link" onClick={()=>{this.addRow()}}><i className="fas fa-plus m-r-1"></i>Add</button></div>
@@ -234,8 +249,6 @@ export default class Grid extends React.Component {
             showPagination={false}
           />  
         </React.Fragment>
-             
-      
     );
   }
 }

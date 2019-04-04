@@ -1,14 +1,15 @@
 import React from 'react';
 import DatePicker from "react-datepicker";
 import Select from 'react-select';
-import Grid from './../../components/grid.jsx';
+import Grid from '../grid';
 import $ from 'jquery';
+import { PacmanLoader } from 'react-spinners';
 
 
 export default class DeliveryChallan extends React.Component{
     constructor(props) {
         super(props);     
-        console.log(props.products);           
+        console.log("constructor props",props);           
         this.partyCodeSelectRef = React.createRef();
         this.lorryNumberSelectRef = React.createRef();
         this.destinationSelectRef =React.createRef();
@@ -17,49 +18,16 @@ export default class DeliveryChallan extends React.Component{
             name:null,
             nameAddress:null,
             partyCodeSelected:null,
-            partyCodes:[
-                { value: '1097', label: '1097' ,name:'Executive Engineer(MSP), Karnataka Power Corpn. Ltd,Dandeli, 581325',destination:'Bengaluru'},
-                { value: '1105', label: '1105' ,name:'Executive Engineer(MSP), Karnataka Power Corpn. Ltd,Jogfalls, 577435' ,destination:'Kozhikode'},
-                { value: '1170', label: '1170',name:'M/S Raja Industrial Works, Garden Area, Shimoga,577201',destination:'Coimbatore' },
-                { value: '1434', label: '1434' ,name:'The Stores Manager Beml Ltd., Mysore Truck Division, Belavadi Post Mysore,570018',destination:'Bengaluru'},
-                { value: '1705', label: '1705' ,name:'Deputy Manager- Stores, Central Receipt Stores, metropolitan Transport Corp(Chennai) Ltd, Ayanavaram, Chennai, 600023',destination:'Bengaluru'},
-                { value: '2250', label: '2250' ,name:'Executive Engineer(MSP), Karnataka Power Corpn. Ltd,Hosangadi, 576282',destination:'Bengaluru'}
-            ],
+            partyCodes:[],
             lorryNumberSelected:null,
-            lorryNumbers:[                
-                { value: 'KA-19-D-1188',label:'KA-19-D-1188',nameAddress:'nameAddress1'},
-                { value: 'KA-19-D-3061',label:'KA-19-D-3061',nameAddress:'nameAddress2'},
-                { value: 'KA-19-D-2100',label:'KA-19-D-2100',nameAddress:'nameAddress3'},
-                { value: 'KA-19-D-7171',label:'KA-19-D-7171',nameAddress:'nameAddress4'},
-                { value: 'KA-19-D-8596',label:'KA-19-D-8596',nameAddress:'nameAddress5'},
-                { value: 'KA-19-D-9875',label:'KA-19-D-9875',nameAddress:'nameAddress6'},
-                { value: 'KA-19-D-1235',label:'KA-19-D-1235',nameAddress:'nameAddress7'},
-                { value: 'KA-19-D-9832',label:'KA-19-D-9832',nameAddress:'nameAddress8'},
-                { value: 'KA-19-D-7423',label:'KA-19-D-7423',nameAddress:'nameAddress9'},
-                { value: 'KA-19-D-8524',label:'KA-19-D-8524',nameAddress:'nameAddress10'}
-            ],
+            lorryNumbers:[],
             destinationSelected:null,
-            destinations:[                
-                { value: 'Bengaluru',label:'Bengaluru'},
-                { value: 'Kozhikode',label:'Kozhikode'},
-                { value: 'Coimbatore',label:'Coimbatore'},
-                { value: 'Vijayawada',label:'Vijayawada'},
-                { value: 'Hyderabad',label:'Hyderabad'},
-                { value: 'Hubali',label:'Hubali'},
-                { value: 'Chennai',label:'Chennai'}
-            ],
+            destinations:[],
             discount:0,
             data: [
-                {"sn":1,"productNumber":"","quantity":0,"rate":0,"total":0}       
+                {"sn":1,"productNumber":"","quantity":0,"rate":0,"weight":0,"total":0}       
             ],
-            products:[              
-              { id: '1', label: '125.06/A2', rate:1400},
-              { id: '2', label: '125.06/AM', rate:2320},
-              { id: '3', label: '122.06/2P', rate:150},
-              { id: '4', label: '123.063', rate:230},
-              { id: '5', label: '125.064', rate:4500 },
-              { id: '6', label: '125.06/AM1', rate:180 }
-              ]
+            products:[]
         };
         this.initDefaults = this.initDefaults.bind(this);    
         this.handleDateChange = this.handleDateChange.bind(this); 
@@ -105,22 +73,20 @@ export default class DeliveryChallan extends React.Component{
           }
         });
 
-     
-
         $(window).keyup(function(e) {
-            if (e.ctrlKey && e.altKey && e.which == 83) {
+            if (e.ctrlKey && e.altKey && e.which === 83) {
                 //ctrl + altKey + s
                 alert("Saved");
-            }else if (e.ctrlKey && e.altKey && e.which == 67){
+            }else if (e.ctrlKey && e.altKey && e.which === 67){
                 //ctrl + altKey + c
                 alert("Cancel");
             }
         });
     }
 
-    componentDidMount(){
+    componentWillMount(){
         this.initDefaults();
-       
+        this.props.fetchDeliveryChallanDetails();
     }
 
     focucNextControl(item){    
@@ -149,7 +115,7 @@ export default class DeliveryChallan extends React.Component{
     handlePartyCodeAsyncChange(keys){
         let allPartyCodes = this.state.partyCodes,filteredPartyCodes=[];
         filteredPartyCodes = allPartyCodes.filter((item,key,items)=>{
-            return item.value.startsWith(keys) === true;
+            return item.label.startsWith(keys) === true;
         })
         if(filteredPartyCodes.length===1){
             this.setState({ partyCodeSelected:filteredPartyCodes[0] });     
@@ -171,7 +137,7 @@ export default class DeliveryChallan extends React.Component{
            label,
            value: label.toLowerCase().replace(/\W/g, ''),
         }
-      };
+    };
 
     handleLorryNumberCreate(inputValue){
         setTimeout(() => {
@@ -183,7 +149,7 @@ export default class DeliveryChallan extends React.Component{
             lorryNumberSelected: newOption,
           });
         }, 1000);
-      };
+    };
 
     setNameAddress(lorryNumberSelected){
         this.setState({ nameAddress: (lorryNumberSelected ? lorryNumberSelected.nameAddress:'NA')});
@@ -213,49 +179,108 @@ export default class DeliveryChallan extends React.Component{
     }
 
     handleSave(){
-        const data="qqq"
-        console.log("props=",this.props)
-        this.props.createDeliveryChallan(data);
+        var current_date = this.state.startDate;  
+        console.log(current_date);
+        // Convert minutes Offset in hours offset
+         var utc_offset_hours = current_date.getTimezoneOffset() / 60;  
+         utc_offset_hours = (-1) * utc_offset_hours;
+         console.log(utc_offset_hours);
+         
+        const deliveryChallanData=[{
+            PartyId:this.state.partyCodeSelected.value,
+            VehicleId:this.state.lorryNumberSelected.value,
+            DcNumber:"1",
+            DestinationId:this.state.destinationSelected.value,
+            TotalQuantity:100,
+            Weight:100,
+            BillAmount:1000,
+            ProductDetails:this.state.data,
+            DeliveryChallanDate:this.state.startDate,
+            Discount:this.state.discount,
+        }];
+        this.props.postDeliveryChallanData(deliveryChallanData);
     }
 
-    getproducts(){
-        if(this.props.products!==undefined)
-        {
-            return this.props.products.payload.data;
+    componentWillReceiveProps(nextProps){
+        if(nextProps.products!==this.props.products){
+            this.setState({products:nextProps.products});
+        }
+
+        if(nextProps.partyCodes!==this.props.partyCodes){
+            const duplicatePartyCodes=[...nextProps.partyCodes]
+            const Newpartycodes = duplicatePartyCodes.map(x=>({
+                value:x.id,
+                label:x.code,
+                name:x.name +", "+x.address1,
+                address1:x.address1,
+                address2:x.address2,
+                destination:x.destination}));
+            this.setState({partyCodes:Newpartycodes});
+        }
+
+        if(nextProps.destinations!==this.props.destinations){
+            const duplicateDestinations=[...nextProps.destinations]
+            const NewLorryNumbers = duplicateDestinations.map(x=>({
+                value:x.id,
+                label:x.name,
+                state:x.state.name}));
+            this.setState({destinations:NewLorryNumbers});
+        }
+
+        if(nextProps.lorryNumbers!==this.props.lorryNumbers){
+            const duplicateLorryNumbers=[...nextProps.lorryNumbers]
+            const NewLorryNumbers = duplicateLorryNumbers.map(x=>({
+                value:x.id,
+                label:x.vehicleNumber,
+                nameAddress:x.vehicleOwner.name +", "+x.vehicleOwner.address,
+                address1:x.address1,
+                address2:x.address2}));
+            this.setState({lorryNumbers:NewLorryNumbers});
         }
     }
 
-    componentWillMount(){
-        this.props.getDeliveryChallanDetails();
-    }
-    
-
     render(){
-        const { partyCodeSelected,partyCodes,lorryNumberSelected,lorryNumbers , destinationSelected,destinations,name,nameAddress,data,discount } = this.state;
+        const { partyCodeSelected,partyCodes,lorryNumberSelected,lorryNumbers,destinationSelected,destinations,name,nameAddress,data,discount } = this.state;
 
         const totalQuantity = data.reduce(function(prev, cur) {
             return parseInt(prev) + parseInt(cur.quantity);
           }, 0);
 
+        const totalWeight= data.reduce(function(prev, cur) {
+            return parseInt(prev) + parseInt(cur.quantity * cur.weight);
+        }, 0);
+
         const totalAmount = data.reduce(function(prev, cur) {
             return parseInt(prev) + parseInt(cur.total);
-          }, 0);
+        }, 0);
 
         const saveAmmount = parseFloat((totalAmount*discount) / 100);
 
-        const billAmount=totalAmount-saveAmmount;
+        const billAmount = totalAmount-saveAmmount;
 
-        console.log(this.state.products);
-
-        console.log("product",this.props.products);
-        return(                                   
+        if(this.props.loading){
+        return ( 
+                <div className="cs-form">
+                    <div align="center">
+                        <PacmanLoader
+                            size={20}
+                            color="#3A9CEE"
+                            loading={this.props.products.loading}
+                        />
+                    </div>
+                </div> 
+            );
+        }
+        else
+        {
+            return(                                   
             <div className="cs-form">
                 <section className="cs-form__container">
                     <div className="row">
                         <div className="col-2">
                             <div className="cs-form__group">
                                 <label className="cs-form__label">Party Code</label> 
-                                <Select className='cs-select' classNamePrefix="cs-select" 
+                                <Select className='cs-select' classNamePrefix="cs-select"
                                     value={partyCodeSelected}
                                     onChange={this.handlePartyCodeChange}
                                     options={partyCodes} autoFocus={true} ref={this.partyCodeSelectRef}
@@ -339,9 +364,9 @@ export default class DeliveryChallan extends React.Component{
                     <div className="col-8">
                         <section className="cs-form__container cs-form__container--mHeight150">                           
                             <Grid
-                            {...this.state}
-                            handleUpdateData={this.handleUpdateData}
-                            handleUpdateNewData={this.handleUpdateNewData}
+                                {...this.state}
+                                handleUpdateData={this.handleUpdateData}
+                                handleUpdateNewData={this.handleUpdateNewData}
                             />
                         </section>
                     </div>
@@ -353,7 +378,7 @@ export default class DeliveryChallan extends React.Component{
                             </div>
                             <div className="cs-form__summary-item">                                                            
                                 <label className="cs-form__label">Total Weight</label> 
-                                <div className="cs-form__data">0</div>                                   
+                                <div className="cs-form__data">{totalWeight}</div>                                   
                             </div>
                             <div className="cs-form__summary-item">                                                            
                                 <label className="cs-form__label">Total Amount</label> 
@@ -409,6 +434,7 @@ export default class DeliveryChallan extends React.Component{
                     </span>
                 </article>
             </div>    
-        )
+            )
+        }
     }
 }
