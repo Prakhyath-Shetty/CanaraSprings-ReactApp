@@ -6,9 +6,9 @@ import {fetchDeliveryChallanDetails,postDeliveryChallanData} from './actions';
 
 
 const mapStateToProps = (state, ownProps) => {
-  console.log("mapStateToProps",state.deliveryChallan);
     return {
       loading:state.deliveryChallan.loading,
+      dcNumber:state.deliveryChallan.payload.dcNumber,
       products:state.deliveryChallan.payload.products,
       destinations:state.deliveryChallan.payload.destinations,
       lorryNumbers:state.deliveryChallan.payload.lorryNumbers,

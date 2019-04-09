@@ -10,7 +10,6 @@ export const fetchDeliveryChallanDetails=()=>async (dispatch)=>{
 }
 
 export const postDeliveryChallanData=(deliveryChallanData)=>async (dispatch)=>{
-    debugger
     const res = await fetch('http://localhost:4789/api/DeliveryChallan', {
     method: 'post',
     headers: {
@@ -18,7 +17,9 @@ export const postDeliveryChallanData=(deliveryChallanData)=>async (dispatch)=>{
             'content-Type': 'application/json'
             },
     body: JSON.stringify(deliveryChallanData)});
+    
     const json = await res.json();
+    console.log("datastringi",JSON.stringify(deliveryChallanData));
     console.log("",json);
 
     // fetch('http://localhost:4789/api/values', 
@@ -39,6 +40,7 @@ export function requestDeliveryChallanDetails() {
     return {
         type: actionTypes.FETCH_DELIVERYCHALLAN, 
         payload:{
+            dcNumber:"",
             products:"",
             partyCodes:"",
             lorryNumbers:"",

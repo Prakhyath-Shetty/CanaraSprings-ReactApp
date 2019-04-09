@@ -8,8 +8,7 @@ import { PacmanLoader } from 'react-spinners';
 
 export default class DeliveryChallan extends React.Component{
     constructor(props) {
-        super(props);     
-        console.log("constructor props",props);           
+        super(props);           
         this.partyCodeSelectRef = React.createRef();
         this.lorryNumberSelectRef = React.createRef();
         this.destinationSelectRef =React.createRef();
@@ -23,11 +22,16 @@ export default class DeliveryChallan extends React.Component{
             lorryNumbers:[],
             destinationSelected:null,
             destinations:[],
-            discount:0,
-            data: [
-                {"sn":1,"productNumber":"","quantity":0,"rate":0,"weight":0,"total":0}       
-            ],
-            products:[]
+            discount:"",
+            data: [{"sn":1,"productNumber":"","quantity":0,"rate":0,"weight":0,"total":0}],
+            products:[],
+            dcNumber:null,
+            totalQuantity:0,
+            totalWeight:0,
+            totalAmount:0,
+            saveAmmount:0,
+            billAmount:0,
+            s:[{}]
         };
         this.initDefaults = this.initDefaults.bind(this);    
         this.handleDateChange = this.handleDateChange.bind(this); 
@@ -89,8 +93,7 @@ export default class DeliveryChallan extends React.Component{
         this.props.fetchDeliveryChallanDetails();
     }
 
-    focucNextControl(item){    
-        
+    focucNextControl(item){
         let all_inputs,all_input_array, new_index,move_to,current_input;
         
         all_inputs = "input,textarea,select";
@@ -102,6 +105,47 @@ export default class DeliveryChallan extends React.Component{
         move_to = all_input_array.eq(new_index);
         move_to.focus();
         move_to.select();        
+    }
+
+    componentWillReceiveProps(nextProps){
+        const dcNumber=nextProps.dcNumber;
+        this.setState({dcNumber})
+        
+        if(nextProps.products!==this.props.products){
+            this.setState({products:nextProps.products});
+        }
+
+        if(nextProps.partyCodes!==this.props.partyCodes){
+            const duplicatePartyCodes=[...nextProps.partyCodes]
+            const Newpartycodes = duplicatePartyCodes.map(x=>({
+                value:x.id,
+                label:x.code,
+                name:x.name +", "+x.address1,
+                address1:x.address1,
+                address2:x.address2,
+                destination:x.destination}));
+            this.setState({partyCodes:Newpartycodes});
+        }
+
+        if(nextProps.destinations!==this.props.destinations){
+            const duplicateDestinations=[...nextProps.destinations]
+            const NewLorryNumbers = duplicateDestinations.map(x=>({
+                value:x.id,
+                label:x.name,
+                state:x.state.name}));
+            this.setState({destinations:NewLorryNumbers});
+        }
+
+        if(nextProps.lorryNumbers!==this.props.lorryNumbers){
+            const duplicateLorryNumbers=[...nextProps.lorryNumbers]
+            const NewLorryNumbers = duplicateLorryNumbers.map(x=>({
+                value:x.id,
+                label:x.vehicleNumber,
+                nameAddress:x.vehicleOwner.name +", "+x.vehicleOwner.address,
+                address1:x.address1,
+                address2:x.address2}));
+            this.setState({lorryNumbers:NewLorryNumbers});
+        }
     }
 
     handlePartyCodeChange(partyCodeSelected){
@@ -165,35 +209,76 @@ export default class DeliveryChallan extends React.Component{
     }
 
     handleChangeDiscount(e){
-        this.setState({discount:e.currentTarget.value});
+        this.setState({discount:e.currentTarget.value},function () {
+            this.handleBillCalculation();
+            });
     }
 
-    handleUpdateData=data=>{
-        this.setState({data});
+    handleUpdateGridData=data=>{
+        this.setState({data},function () {
+            this.handleBillCalculation();
+            });
     }
 
-    handleUpdateNewData=newData=>{
-        this.setState(state => ({
-            data: newData
-        }));
+    handleUpdateGridNewData=newData=>{
+        this.setState({ data:newData },function () {
+            this.handleBillCalculation();
+            });
     }
+
+    handleBillCalculation=()=>{
+        const {discount,data}=this.state;
+        const totalQuantity = data.reduce(function(prev, cur) {
+            return parseInt(prev) + parseInt(cur.quantity);
+          }, 0);
+          this.setState({totalQuantity});
+          
+        //   if(isNaN(caltotalQuantity)){
+        //     this.setState({totalQuantity:0});
+        //   }
+        //   else{
+        //     this.setState({totalQuantity:caltotalQuantity});
+        //   }
+         
+        const totalWeight= data.reduce(function(prev, cur) {
+            return parseInt(prev) + parseInt(cur.quantity * cur.weight);
+        }, 0);
+        this.setState({totalWeight});
+
+        const totalAmount = data.reduce(function(prev, cur) {
+            return parseInt(prev) + parseInt(cur.total);
+        }, 0);
+        this.setState({totalAmount});
+
+        const saveAmmount = parseFloat((totalAmount*discount) / 100);
+        this.setState({saveAmmount});
+
+        const billAmount = totalAmount-saveAmmount;
+        this.setState({billAmount});
+    };
 
     handleSave(){
-        var current_date = this.state.startDate;  
-        console.log(current_date);
-        // Convert minutes Offset in hours offset
-         var utc_offset_hours = current_date.getTimezoneOffset() / 60;  
-         utc_offset_hours = (-1) * utc_offset_hours;
-         console.log(utc_offset_hours);
-         
+        // var current_date = this.state.startDate;  
+        // console.log(current_date);
+        // // Convert minutes Offset in hours offset
+        //  var utc_offset_hours = current_date.getTimezoneOffset() / 60;  
+        //  utc_offset_hours = (-1) * utc_offset_hours;
+        //  console.log(utc_offset_hours);
+
+        // var dd = this.state.startDate.getDate();
+        // var mm = this.state.startDate.getMonth();
+        // var yy = this.state.startDate.getFullYear();
+        // var fulldate = dd + "-" + mm + "-" + yy;
+        console.log(this.state.data);
+        
         const deliveryChallanData=[{
             PartyId:this.state.partyCodeSelected.value,
-            VehicleId:this.state.lorryNumberSelected.value,
-            DcNumber:"1",
+            VehicleId:(this.state.lorryNumberSelected.value).toString(),
+            DcNumber:this.state.dcNumber,
             DestinationId:this.state.destinationSelected.value,
-            TotalQuantity:100,
-            Weight:100,
-            BillAmount:1000,
+            TotalQuantity:this.state.totalQuantity,
+            Weight:this.state.totalWeight,
+            BillAmount:this.state.billAmount,
             ProductDetails:this.state.data,
             DeliveryChallanDate:this.state.startDate,
             Discount:this.state.discount,
@@ -201,62 +286,8 @@ export default class DeliveryChallan extends React.Component{
         this.props.postDeliveryChallanData(deliveryChallanData);
     }
 
-    componentWillReceiveProps(nextProps){
-        if(nextProps.products!==this.props.products){
-            this.setState({products:nextProps.products});
-        }
-
-        if(nextProps.partyCodes!==this.props.partyCodes){
-            const duplicatePartyCodes=[...nextProps.partyCodes]
-            const Newpartycodes = duplicatePartyCodes.map(x=>({
-                value:x.id,
-                label:x.code,
-                name:x.name +", "+x.address1,
-                address1:x.address1,
-                address2:x.address2,
-                destination:x.destination}));
-            this.setState({partyCodes:Newpartycodes});
-        }
-
-        if(nextProps.destinations!==this.props.destinations){
-            const duplicateDestinations=[...nextProps.destinations]
-            const NewLorryNumbers = duplicateDestinations.map(x=>({
-                value:x.id,
-                label:x.name,
-                state:x.state.name}));
-            this.setState({destinations:NewLorryNumbers});
-        }
-
-        if(nextProps.lorryNumbers!==this.props.lorryNumbers){
-            const duplicateLorryNumbers=[...nextProps.lorryNumbers]
-            const NewLorryNumbers = duplicateLorryNumbers.map(x=>({
-                value:x.id,
-                label:x.vehicleNumber,
-                nameAddress:x.vehicleOwner.name +", "+x.vehicleOwner.address,
-                address1:x.address1,
-                address2:x.address2}));
-            this.setState({lorryNumbers:NewLorryNumbers});
-        }
-    }
-
     render(){
-        const { partyCodeSelected,partyCodes,lorryNumberSelected,lorryNumbers,destinationSelected,destinations,name,nameAddress,data,discount } = this.state;
-
-        const totalQuantity = data.reduce(function(prev, cur) {
-            return parseInt(prev) + parseInt(cur.quantity);
-          }, 0);
-
-        const totalWeight= data.reduce(function(prev, cur) {
-            return parseInt(prev) + parseInt(cur.quantity * cur.weight);
-        }, 0);
-
-        const totalAmount = data.reduce(function(prev, cur) {
-            return parseInt(prev) + parseInt(cur.total);
-        }, 0);
-
-        const saveAmmount = parseFloat((totalAmount*discount) / 100);
-
-        const billAmount = totalAmount-saveAmmount;
+        const { partyCodeSelected,partyCodes,lorryNumberSelected,lorryNumbers,destinationSelected,destinations,name,nameAddress,discount,totalQuantity,totalWeight,totalAmount,saveAmmount,billAmount,dcNumber } = this.state;
 
         if(this.props.loading){
         return ( 
@@ -297,7 +328,7 @@ export default class DeliveryChallan extends React.Component{
                         <div className="col-2">
                             <div className="cs-form__group">
                                 <label className="cs-form__label">D.C. No</label>
-                                <div className="cs-form__data">0</div>
+                                <div className="cs-form__data">{dcNumber}</div>
                             </div>
                         </div>
                         <div className="col-2">
@@ -348,7 +379,7 @@ export default class DeliveryChallan extends React.Component{
                                 <label className="cs-form__label">Discount</label>
                                 <input type="number" className="cs-form__control form-control" placeholder=""
                                 name="discount"
-                                value={discount===0?"":discount}
+                                value={discount===isNaN?0:discount}
                                 onChange={this.handleChangeDiscount}/>                                    
                             </div>
                         </div>
@@ -365,8 +396,8 @@ export default class DeliveryChallan extends React.Component{
                         <section className="cs-form__container cs-form__container--mHeight150">                           
                             <Grid
                                 {...this.state}
-                                handleUpdateData={this.handleUpdateData}
-                                handleUpdateNewData={this.handleUpdateNewData}
+                                handleUpdateData={this.handleUpdateGridData}
+                                handleUpdateNewData={this.handleUpdateGridNewData}
                             />
                         </section>
                     </div>

@@ -121,7 +121,7 @@ export default class Grid extends React.Component {
         {"sn":1,"productNumber":"","quantity":0,"rate":0,"weight":0,"total":0}
       )
     }
-    console.log("newData",newData)
+    
     this.props.handleUpdateNewData(newData);
   }
 
@@ -130,8 +130,9 @@ export default class Grid extends React.Component {
     newData = newData.filter((item,key)=>{
         return key !== cellInfo.index
     });
+    // console.log("before setting",newData);
     this.props.handleUpdateNewData(newData);
-    
+    // console.log("this.props.data from grid",this.props.data);
   }
   
   renderEditable(cellInfo) {
@@ -149,8 +150,7 @@ export default class Grid extends React.Component {
                 if(cellInfo.column.id==='rate'||cellInfo.column.id==='quantity'){
                     data[cellInfo.index]['total'] = parseInt(data[cellInfo.index]['rate']) * data[cellInfo.index]['quantity'] 
                 }
-                
-                this.setState({ data });
+                this.props.handleUpdateData(data);
             }}
         />
     );
@@ -174,7 +174,7 @@ export default class Grid extends React.Component {
             onChange={e => {
                 const data = [...this.props.data];
                 data[cellInfo.index][cellInfo.column.id] = e.target.value;              
-                this.setState({ data });
+                this.props.handleUpdateData(data);
             }}
             onSelect={(e,value) =>{
                 const data = [...this.props.data];
@@ -183,7 +183,7 @@ export default class Grid extends React.Component {
                     data[cellInfo.index]['rate'] = value.rate 
                     data[cellInfo.index]['weight'] = value.weight
                 }
-                this.setState({ data });
+                this.props.handleUpdateData(data);
                 const row = $(".cs-grid").find(".rt-tbody .rt-tr-group")[cellInfo.index];
                 const col = $(row).find('.rt-tr .rt-td')[2];
                 $(col).find(".cs-grid__textbox").focus();
