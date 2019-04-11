@@ -6,19 +6,25 @@ let intialstate={
             products:[],
             partyCodes:[],
             lorryNumbers:[],
-            destinations:[]
+            destinations:[],
+            status:''
         },
         loading:true
     }
 
 
 const deliveryChallanReducers=(state=intialstate,action)=>{
+    console.log("action.status",action.status)
     switch(action.type){
         case actionTypes.FETCH_DELIVERYCHALLAN:
-        console.log( "reducer",action.payload);
             return {...state,
                 payload:action.payload,
                 loading:action.loading
+            }
+        case actionTypes.POST_DELIVERYCHALLAN:
+        
+            return {...state,
+                status:action.status
             }
         default: 
             return state;

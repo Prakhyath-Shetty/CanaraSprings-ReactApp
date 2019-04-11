@@ -12,7 +12,8 @@ const mapStateToProps = (state, ownProps) => {
       products:state.deliveryChallan.payload.products,
       destinations:state.deliveryChallan.payload.destinations,
       lorryNumbers:state.deliveryChallan.payload.lorryNumbers,
-      partyCodes:state.deliveryChallan.payload.partyCodes
+      partyCodes:state.deliveryChallan.payload.partyCodes,
+      status:state.deliveryChallan.status
     }
   }
   

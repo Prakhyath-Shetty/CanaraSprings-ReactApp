@@ -148,6 +148,10 @@ export default class DeliveryChallan extends React.Component{
                 address2:x.address2}));
             this.setState({lorryNumbers:NewLorryNumbers});
         }
+
+        if(nextProps.status&&nextProps.status==='saved'){
+            alert("saved");
+        }
     }
 
     handlePartyCodeChange(partyCodeSelected){
@@ -257,8 +261,9 @@ export default class DeliveryChallan extends React.Component{
         if(!partyCodeSelected || !lorryNumberSelected || !destinationSelected || !dcNumber || totalQuantity===0 || totalWeight===0 || billAmount===0){
             const formIsValid=false;
             this.setState({formIsValid})
-            alert("Please enter all the information");
+            alert("please Enter all the details");
         }
+        try {
             const deliveryChallanData={
                 PartyId:partyCodeSelected.value,
                 VehicleId:(lorryNumberSelected.value).toString(),
@@ -272,23 +277,27 @@ export default class DeliveryChallan extends React.Component{
                 Discount:parseInt(discount)||0
             };
             await this.props.postDeliveryChallanData(deliveryChallanData);
-        } 
+        } catch (ex) {
+            if(ex.responce && ex.responce.status===400){
+                alert(ex.responce.data);
+            }
+        }
     }
 
     render(){
         const { partyCodeSelected,partyCodes,lorryNumberSelected,lorryNumbers,destinationSelected,destinations,name,nameAddress,discount,totalQuantity,totalWeight,totalAmount,saveAmmount,billAmount,dcNumber } = this.state;
             
         if(this.props.loading){
-        return (
+        return ( 
                 <div className="cs-form">
                     <div align="center">
                         <PacmanLoader
                             size={20}
-                            color="#3A9CEE"
+                            color="#1e8aff"
                             loading={this.props.loading}
                         />
                     </div>
-                </div>
+                </div> 
             );
         }
         else
