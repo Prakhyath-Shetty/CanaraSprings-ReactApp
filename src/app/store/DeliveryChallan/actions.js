@@ -9,30 +9,19 @@ export const fetchDeliveryChallanDetails=()=>async (dispatch)=>{
       dispatch(reciveDeliveryChallanDetails(json));
 }
 
-export const postDeliveryChallanData=(deliveryChallanData)=>async (dispatch)=>{
+export const postDeliveryChallanData=(deliveryChallanData)=> async (dispatch)=>{
+    console.log("deliveryChallanData",JSON.stringify(deliveryChallanData));
     const res = await fetch('http://localhost:4789/api/DeliveryChallan', {
-    method: 'post',
-    headers: {
-            'accept': 'application/json',
-            'content-Type': 'application/json'
-            },
-    body: JSON.stringify(deliveryChallanData)});
-    
+                method: 'Post',
+                headers: {
+                    'accept': 'application/json',
+                    'content-Type': 'application/json'
+                    },
+                body: JSON.stringify(deliveryChallanData)});
+                
+    console.log("deliveryChallanData",JSON.stringify(deliveryChallanData));
     const json = await res.json();
-    console.log("datastringi",JSON.stringify(deliveryChallanData));
-    console.log("",json);
-
-    // fetch('http://localhost:4789/api/values', 
-    // { method: 'post',
-    // headers: {
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json'
-    //   },
-    // body: JSON.stringify(deliveryChallanData)}).then(function(response) {
-    //     return response.json();
-    //   }).then(function(data) {
-    //     console.log("respond",data);
-    // });
+    console.log("res.json",json);
 }
 
 
@@ -40,11 +29,11 @@ export function requestDeliveryChallanDetails() {
     return {
         type: actionTypes.FETCH_DELIVERYCHALLAN, 
         payload:{
-            dcNumber:"",
-            products:"",
-            partyCodes:"",
-            lorryNumbers:"",
-            destinations:""
+            dcNumber:0,
+            products:[],
+            partyCodes:[],
+            lorryNumbers:[],
+            destinations:[]
         }, 
         loading:true
     };

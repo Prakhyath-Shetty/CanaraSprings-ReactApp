@@ -2,11 +2,11 @@ import * as actionTypes from './actionTypes';
 
 let intialstate={
         payload:{
-            dcNumber:"",
-            products:"",
-            partyCodes:"",
-            lorryNumbers:"",
-            destinations:""
+            dcNumber:0,
+            products:[],
+            partyCodes:[],
+            lorryNumbers:[],
+            destinations:[]
         },
         loading:true
     }

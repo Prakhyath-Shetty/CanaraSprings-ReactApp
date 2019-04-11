@@ -130,9 +130,7 @@ export default class Grid extends React.Component {
     newData = newData.filter((item,key)=>{
         return key !== cellInfo.index
     });
-    // console.log("before setting",newData);
     this.props.handleUpdateNewData(newData);
-    // console.log("this.props.data from grid",this.props.data);
   }
   
   renderEditable(cellInfo) {

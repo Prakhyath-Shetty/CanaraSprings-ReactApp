@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import DatePicker from "react-datepicker";
 import Select from 'react-select';
 import Grid from '../grid';
@@ -31,7 +32,7 @@ export default class DeliveryChallan extends React.Component{
             totalAmount:0,
             saveAmmount:0,
             billAmount:0,
-            s:[{}]
+            formIsValid:true
         };
         this.initDefaults = this.initDefaults.bind(this);    
         this.handleDateChange = this.handleDateChange.bind(this); 
@@ -43,7 +44,7 @@ export default class DeliveryChallan extends React.Component{
         this.setName = this.setName.bind(this);
         this.setNameAddress = this.setNameAddress.bind(this);
         this.handleChangeDiscount=this.handleChangeDiscount.bind(this);
-        this.handleSave=this.handleSave.bind(this);
+        this.onSave=this.onSave.bind(this);
 
         this.focucNextControl = this.focucNextControl.bind(this);
     }
@@ -123,7 +124,8 @@ export default class DeliveryChallan extends React.Component{
                 name:x.name +", "+x.address1,
                 address1:x.address1,
                 address2:x.address2,
-                destination:x.destination}));
+                destinationId:x.destinationId,
+                destination:x.destination || {id:null, name:null} }));
             this.setState({partyCodes:Newpartycodes});
         }
 
@@ -151,7 +153,7 @@ export default class DeliveryChallan extends React.Component{
     handlePartyCodeChange(partyCodeSelected){
         this.setState({ partyCodeSelected });            
         this.setName(partyCodeSelected);   
-        let curDestinationSelected = partyCodeSelected ? this.state.destinations.filter((item,key) => {return item.label === partyCodeSelected.destination}):[];
+        let curDestinationSelected = partyCodeSelected ? this.state.destinations.filter((item,key) => { return item.label === partyCodeSelected.destination.name}):[];
         this.handleDestinationChange(curDestinationSelected[0],true);
         this.focucNextControl(this.partyCodeSelectRef.current);       
     }
@@ -229,16 +231,9 @@ export default class DeliveryChallan extends React.Component{
     handleBillCalculation=()=>{
         const {discount,data}=this.state;
         const totalQuantity = data.reduce(function(prev, cur) {
-            return parseInt(prev) + parseInt(cur.quantity);
+            return parseInt(prev) + parseInt(cur.quantity||0);
           }, 0);
           this.setState({totalQuantity});
-          
-        //   if(isNaN(caltotalQuantity)){
-        //     this.setState({totalQuantity:0});
-        //   }
-        //   else{
-        //     this.setState({totalQuantity:caltotalQuantity});
-        //   }
          
         const totalWeight= data.reduce(function(prev, cur) {
             return parseInt(prev) + parseInt(cur.quantity * cur.weight);
@@ -257,49 +252,43 @@ export default class DeliveryChallan extends React.Component{
         this.setState({billAmount});
     };
 
-    handleSave(){
-        // var current_date = this.state.startDate;  
-        // console.log(current_date);
-        // // Convert minutes Offset in hours offset
-        //  var utc_offset_hours = current_date.getTimezoneOffset() / 60;  
-        //  utc_offset_hours = (-1) * utc_offset_hours;
-        //  console.log(utc_offset_hours);
-
-        // var dd = this.state.startDate.getDate();
-        // var mm = this.state.startDate.getMonth();
-        // var yy = this.state.startDate.getFullYear();
-        // var fulldate = dd + "-" + mm + "-" + yy;
-        console.log(this.state.data);
-        
-        const deliveryChallanData=[{
-            PartyId:this.state.partyCodeSelected.value,
-            VehicleId:(this.state.lorryNumberSelected.value).toString(),
-            DcNumber:this.state.dcNumber,
-            DestinationId:this.state.destinationSelected.value,
-            TotalQuantity:this.state.totalQuantity,
-            Weight:this.state.totalWeight,
-            BillAmount:this.state.billAmount,
-            ProductDetails:this.state.data,
-            DeliveryChallanDate:this.state.startDate,
-            Discount:this.state.discount,
-        }];
-        this.props.postDeliveryChallanData(deliveryChallanData);
+    onSave = async ()=>{
+        const {partyCodeSelected,lorryNumberSelected,dcNumber,destinationSelected,totalQuantity,totalWeight,billAmount,data,startDate,discount}=this.state;
+        if(!partyCodeSelected || !lorryNumberSelected || !destinationSelected || !dcNumber || totalQuantity===0 || totalWeight===0 || billAmount===0){
+            const formIsValid=false;
+            this.setState({formIsValid})
+            alert("Please enter all the information");
+        }
+            const deliveryChallanData={
+                PartyId:partyCodeSelected.value,
+                VehicleId:(lorryNumberSelected.value).toString(),
+                DcNumber:dcNumber,
+                DestinationId:destinationSelected.value,
+                TotalQuantity:totalQuantity,
+                Weight:totalWeight,
+                BillAmount:billAmount,
+                ProductDetails:JSON.stringify(data),
+                DeliveryChallanDate:startDate,
+                Discount:parseInt(discount)||0
+            };
+            await this.props.postDeliveryChallanData(deliveryChallanData);
+        } 
     }
 
     render(){
         const { partyCodeSelected,partyCodes,lorryNumberSelected,lorryNumbers,destinationSelected,destinations,name,nameAddress,discount,totalQuantity,totalWeight,totalAmount,saveAmmount,billAmount,dcNumber } = this.state;
-
+            
         if(this.props.loading){
-        return ( 
+        return (
                 <div className="cs-form">
                     <div align="center">
                         <PacmanLoader
                             size={20}
                             color="#3A9CEE"
-                            loading={this.props.products.loading}
+                            loading={this.props.loading}
                         />
                     </div>
-                </div> 
+                </div>
             );
         }
         else
@@ -460,7 +449,7 @@ export default class DeliveryChallan extends React.Component{
                 </div>                            
                 <article className="cs-form__actions">
                     <span className="float-right">
-                        <button className="cs-btn btn" onClick={this.handleSave}>Save</button>
+                        <button className="cs-btn btn" onClick={this.onSave}>Save</button>
                         <button className="cs-btn btn">Cancel</button>
                     </span>
                 </article>
@@ -468,4 +457,14 @@ export default class DeliveryChallan extends React.Component{
             )
         }
     }
+}
+
+
+DeliveryChallan.propTypes={
+    loading:PropTypes.bool.isRequired,
+    dcNumber:PropTypes.number.isRequired,
+    products:PropTypes.array.isRequired,
+    destinations:PropTypes.array.isRequired,
+    lorryNumbers:PropTypes.array.isRequired,
+    partyCodes:PropTypes.array.isRequired
 }
