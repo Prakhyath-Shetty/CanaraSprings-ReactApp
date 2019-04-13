@@ -150,6 +150,7 @@ export default class DeliveryChallan extends React.Component{
         }
 
         if(nextProps.status&&nextProps.status==='saved'){
+            console.log(nextProps.status)
             alert("saved");
         }
     }

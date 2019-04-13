@@ -42,7 +42,6 @@ export const postDeliveryChallanData=(deliveryChallanData)=> (dispatch)=>{
             .then(function(data) {
                 console.log("data",data);
                 if(data){
-                    console.log(data);
                     dispatch(reciveResponceDeliveryChallanPost(data));
                 }
                 else{

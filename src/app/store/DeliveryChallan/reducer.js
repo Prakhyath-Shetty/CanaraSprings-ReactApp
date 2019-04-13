@@ -19,10 +19,10 @@ const deliveryChallanReducers=(state=intialstate,action)=>{
         case actionTypes.FETCH_DELIVERYCHALLAN:
             return {...state,
                 payload:action.payload,
-                loading:action.loading
+                loading:action.loading,
+                status:''
             }
         case actionTypes.POST_DELIVERYCHALLAN:
-        
             return {...state,
                 status:action.status
             }
