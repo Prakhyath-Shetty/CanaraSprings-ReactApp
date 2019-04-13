@@ -266,7 +266,7 @@ export default class DeliveryChallan extends React.Component{
         try {
             const deliveryChallanData={
                 PartyId:partyCodeSelected.value,
-                VehicleId:(lorryNumberSelected.value).toString(),
+                VehicleId:lorryNumberSelected.label,
                 DcNumber:dcNumber,
                 DestinationId:destinationSelected.value,
                 TotalQuantity:totalQuantity,

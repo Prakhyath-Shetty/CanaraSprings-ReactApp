@@ -9,7 +9,6 @@ export default class Grid extends React.Component {
   constructor() {
     super();
     this.gridRef = React.createRef();
-    
     this.renderEditable = this.renderEditable.bind(this);
     this.renderAutocomplete =this.renderAutocomplete.bind(this);
     this.renderAction = this.renderAction.bind(this);
@@ -170,9 +169,21 @@ export default class Grid extends React.Component {
             }
             value={this.props.data[cellInfo.index][cellInfo.column.id]} 
             onChange={e => {
+                let filArr = [];
                 const data = [...this.props.data];
                 data[cellInfo.index][cellInfo.column.id] = e.target.value;              
                 this.props.handleUpdateData(data);
+                filArr = this.props.products.filter((val,index,array)=>{
+                  console.log(val.partNumber);
+                    return val.partNumber.toLowerCase().replace(/[^0-9a-zA-Z]/g, "") === e.target.value.toLowerCase().replace(/[^0-9a-zA-Z]/g, "")
+                })
+
+                if(filArr.length == 1){                 
+                  const row = $(".cs-grid").find(".rt-tbody .rt-tr-group")[cellInfo.index];
+                  const col = $(row).find('.rt-tr .rt-td')[2];
+                  $(col).find(".cs-grid__textbox").focus();
+                  $(col).find(".cs-grid__textbox").select();
+                }
             }}
             onSelect={(e,value) =>{
                 const data = [...this.props.data];
