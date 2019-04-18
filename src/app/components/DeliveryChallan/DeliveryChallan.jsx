@@ -248,14 +248,23 @@ export default class DeliveryChallan extends React.Component{
         const totalAmount = data.reduce(function(prev, cur) {
             return parseInt(prev) + parseInt(cur.total);
         }, 0);
-        this.setState({totalAmount});
+
+        const totalAmountINR=this.handleFormatINR(totalAmount);
+        this.setState({totalAmount:totalAmountINR});
 
         const saveAmmount = parseFloat((totalAmount*discount) / 100);
-        this.setState({saveAmmount});
+        const saveAmmountINR=this.handleFormatINR(saveAmmount);
+        this.setState({saveAmmount:saveAmmountINR});
 
         const billAmount = totalAmount-saveAmmount;
-        this.setState({billAmount});
+        const billAmountINR=this.handleFormatINR(billAmount);
+        this.setState({billAmount:billAmountINR});
     };
+
+    handleFormatINR=(x)=>{
+        const res =new Intl.NumberFormat('en-IN').format(x);
+        return res;
+    }
 
     onSave = async ()=>{
         const {partyCodeSelected,lorryNumberSelected,dcNumber,destinationSelected,totalQuantity,totalWeight,billAmount,data,startDate,discount}=this.state;
